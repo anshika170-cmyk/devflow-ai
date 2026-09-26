@@ -1,0 +1,22 @@
+{
+  "name": "devflow-orchestrator",
+  "version": "1.0.0",
+  "description": "DevFlow AI orchestration layer: multi-agent debugging, testing, quality and documentation pipeline",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "jest --runInBand --forceExit"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4"
+  },
+  "jest": {
+    "testMatch": ["**/tests/**/*.test.js"],
+    "testPathIgnorePatterns": ["/node_modules/", "/data/"]
+  }
+}
