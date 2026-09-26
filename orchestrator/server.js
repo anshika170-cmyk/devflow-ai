@@ -23,7 +23,9 @@ if (!fs.existsSync(PRISTINE_BACKUP)) {
 const app = express();
 app.use(cors());
 app.use(express.json());
+const DASHBOARD_DIST = path.join(PROJECT_ROOT, 'dashboard', 'dist');
 
+app.use(express.static(DASHBOARD_DIST));
 // In-memory session log — powers the productivity metrics in the final report.
 // Cleared on server restart; this is a demo/prototype, not a persistence layer.
 let session = {
@@ -161,7 +163,9 @@ app.post('/api/reset', (req, res) => {
   session = { bugId: null, startedAt: null, events: [], analysis: null, fixResult: null, testBefore: null, testAfter: null };
   res.json({ reset: true });
 });
-
+app.get('*', (req, res) => {
+  res.sendFile(path.join(DASHBOARD_DIST, 'index.html'));
+});
 if (require.main === module) {
   const PORT = process.env.PORT || 4100;
   app.listen(PORT, () => console.log(`DevFlow AI orchestrator running on :${PORT}`));

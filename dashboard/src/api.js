@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:4100/api';
+ const BASE_URL = '/api';
 
 async function jsonFetch(url, opts) {
   const res = await fetch(url, opts);
