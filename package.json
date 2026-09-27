@@ -1,0 +1,9 @@
+{
+  "name": "devflow-ai",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "npm --prefix dashboard install && npm --prefix dashboard run build && npm --prefix orchestrator install && npm --prefix sample-project/backend install && npm --prefix sample-project/frontend install",
+    "start": "npm --prefix orchestrator start"
+  }
+}

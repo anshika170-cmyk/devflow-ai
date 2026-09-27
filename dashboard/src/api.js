@@ -15,12 +15,27 @@ export const analyzeBug = (bugId) =>
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ bugId })
   });
-export const applyFix = (bugId) =>
-  jsonFetch(`${BASE_URL}/apply-fix`, {
+const BASE_URL = '/api';
+
+export async function applyFix(bugId) {
+  const response = await fetch(`${BASE_URL}/apply-fix`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ bugId })
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      bugId
+    })
   });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || 'Failed to apply fix');
+  }
+
+  return data;
+}
 export const runTests = () => jsonFetch(`${BASE_URL}/run-tests`, { method: 'POST' });
 export const verifyBug = (bugId) => jsonFetch(`${BASE_URL}/verify/${bugId}`);
 export const getReport = (bugId) =>

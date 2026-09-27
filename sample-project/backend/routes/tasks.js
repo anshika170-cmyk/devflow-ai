@@ -29,9 +29,7 @@ router.get('/', (req, res) => {
   }
 
   // Intentional bug: should be case-insensitive `includes`, not `startsWith`.
-  const filtered = tasks.filter(t =>
-    t.title.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = tasks.filter(t => t.title.startsWith(search)); // <-- BUG
 
   res.json(filtered);
 });
