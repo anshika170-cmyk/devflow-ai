@@ -1,47 +1,119 @@
  const BASE_URL = '/api';
 
-async function jsonFetch(url, opts) {
-  const res = await fetch(url, opts);
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
-  return data;
-}
-
-export const getProject = () => jsonFetch(`${BASE_URL}/project`);
-export const getBugs = () => jsonFetch(`${BASE_URL}/bugs`);
-export const analyzeBug = (bugId) =>
-  jsonFetch(`${BASE_URL}/analyze`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ bugId })
-  });
-const BASE_URL = '/api';
-
-export async function applyFix(bugId) {
-  const response = await fetch(`${BASE_URL}/apply-fix`, {
-    method: 'POST',
+async function request(endpoint, options = {}) {
+  const response = await fetch(`${BASE_URL}${endpoint}`, {
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
     },
-    body: JSON.stringify({
-      bugId
-    })
+    ...options
   });
 
-  const data = await response.json();
+  let data;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = {};
+  }
 
   if (!response.ok) {
-    throw new Error(data.error || 'Failed to apply fix');
+    throw new Error(
+      data.error ||
+      `Request failed with status ${response.status}`
+    );
   }
 
   return data;
 }
-export const runTests = () => jsonFetch(`${BASE_URL}/run-tests`, { method: 'POST' });
-export const verifyBug = (bugId) => jsonFetch(`${BASE_URL}/verify/${bugId}`);
-export const getReport = (bugId) =>
-  jsonFetch(`${BASE_URL}/report`, {
+
+// --------------------------------------------------
+// Project
+// --------------------------------------------------
+
+export async function getProject() {
+  return request('/project');
+}
+
+// --------------------------------------------------
+// Bugs
+// --------------------------------------------------
+
+export async function getBugs() {
+  return request('/bugs');
+}
+
+// --------------------------------------------------
+// Analyze bug
+// --------------------------------------------------
+
+export async function analyzeBug(bugId) {
+  return request('/analyze', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ bugId })
+    body: JSON.stringify({
+      bugId
+    })
   });
-export const resetProject = () => jsonFetch(`${BASE_URL}/reset`, { method: 'POST' });
+}
+
+// --------------------------------------------------
+// Apply fix
+// --------------------------------------------------
+
+export async function applyFix(bugId) {
+  return request('/apply-fix', {
+    method: 'POST',
+    body: JSON.stringify({
+      bugId
+    })
+  });
+}
+
+// --------------------------------------------------
+// Run tests
+// --------------------------------------------------
+
+export async function runTests() {
+  return request('/run-tests', {
+    method: 'POST'
+  });
+}
+
+// --------------------------------------------------
+// Verify bug
+// --------------------------------------------------
+
+export async function verifyBug(bugId) {
+  return request(`/verify/${encodeURIComponent(bugId)}`);
+}
+
+// --------------------------------------------------
+// Generate final report
+// --------------------------------------------------
+
+export async function getReport(bugId) {
+  return request('/report', {
+    method: 'POST',
+    body: JSON.stringify({
+      bugId
+    })
+  });
+}
+
+// --------------------------------------------------
+// Reset project
+// --------------------------------------------------
+
+export async function resetProject() {
+  return request('/reset', {
+    method: 'POST'
+  });
+}
+
+// --------------------------------------------------
+// Health check
+// --------------------------------------------------
+
+export async function getHealth() {
+  return request('/health');
+}
