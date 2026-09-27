@@ -17,9 +17,9 @@ router.post('/login', (req, res) => {
 
   // Intentional bug: key should be "username" to match frontend contract.
   res.json({
-    username,
-    token: 'demo-token-123'
-  });
+  username,
+  token: 'demo-token-123'
+});
 });
 
 module.exports = router;

@@ -3,16 +3,6 @@ const path = require('path');
 
 /**
  * Runs the real Jest test suite from the sample backend.
- *
- * Returns structured results for the Testing Agent:
- * {
- *   ranSuccessfully,
- *   testsRun,
- *   passed,
- *   failed,
- *   failures,
- *   status
- * }
  */
 function runTests(projectRoot) {
   return new Promise((resolve) => {
@@ -22,19 +12,13 @@ function runTests(projectRoot) {
       'backend'
     );
 
-    // Use the locally installed Jest executable.
-    // This avoids npx/shell differences between Windows and Railway.
-    const jestCommand =
-      process.platform === 'win32'
-        ? path.join('node_modules', '.bin', 'jest.cmd')
-        : path.join('node_modules', '.bin', 'jest');
-
+    // Windows needs the shell for npx/npm command execution.
     const child = spawn(
-      jestCommand,
-      ['--json', '--silent', '--runInBand'],
+      'npx',
+      ['jest', '--json', '--silent', '--runInBand'],
       {
         cwd,
-        shell: false
+        shell: true
       }
     );
 
@@ -57,24 +41,20 @@ function runTests(projectRoot) {
         failed: 0,
         failures: [],
         status: 'error',
-        error:
-          `Could not start Jest: ${err.message}. ` +
-          `Make sure Jest is installed in sample-project/backend.`,
+        error: `Could not start Jest: ${err.message}`,
         raw: stderr || stdout
       });
     });
 
     child.on('close', (exitCode) => {
-      /*
-       * Jest --json normally puts the JSON result in stdout.
-       *
-       * Instead of assuming the first character is JSON,
-       * locate the JSON object safely.
-       */
       const jsonStart = stdout.indexOf('{');
       const jsonEnd = stdout.lastIndexOf('}');
 
-      if (jsonStart === -1 || jsonEnd === -1 || jsonEnd <= jsonStart) {
+      if (
+        jsonStart === -1 ||
+        jsonEnd === -1 ||
+        jsonEnd <= jsonStart
+      ) {
         resolve({
           ranSuccessfully: false,
           testsRun: 0,
@@ -119,9 +99,6 @@ function runTests(projectRoot) {
 
       const failures = [];
 
-      /*
-       * Jest's JSON format contains testResults for each test suite.
-       */
       for (const suite of parsed.testResults || []) {
         for (const test of suite.testResults || []) {
           if (test.status === 'failed') {
@@ -147,12 +124,6 @@ function runTests(projectRoot) {
         }
       }
 
-      /*
-       * Prefer Jest's summary counters.
-       *
-       * Convert everything to numbers so the frontend
-       * never receives undefined/null and displays 0/0.
-       */
       const testsRun = Number(
         parsed.numTotalTests || 0
       );
@@ -167,22 +138,12 @@ function runTests(projectRoot) {
 
       resolve({
         ranSuccessfully: true,
-
         testsRun,
-
         passed,
-
         failed,
-
         failures,
-
-        status:
-          failed === 0
-            ? 'passed'
-            : 'failed',
-
+        status: failed === 0 ? 'passed' : 'failed',
         source: 'real-jest-run',
-
         exitCode
       });
     });

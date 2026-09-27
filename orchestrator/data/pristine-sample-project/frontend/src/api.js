@@ -22,8 +22,8 @@ export async function fetchTasks(search = '') {
   // inside a React event handler with no boundary, and the UI crashes
   // to a blank white screen instead of showing a message.
   const res = await fetch(url);
-  const data = await res.json();
-  return data;
+const data = await res.json();
+return data;
 }
 
 export async function createTask(title) {

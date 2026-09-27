@@ -29,7 +29,7 @@ router.get('/', (req, res) => {
   }
 
   // Intentional bug: should be case-insensitive `includes`, not `startsWith`.
-  const filtered = tasks.filter(t => t.title.startsWith(search)); // <-- BUG
+  const filtered = tasks.filter(t => t.title.startsWith(search));
 
   res.json(filtered);
 });
@@ -41,9 +41,9 @@ router.get('/', (req, res) => {
 // tasks can be created.
 // --------------------------------------------------------------------
 router.post('/', (req, res) => {
-  const { title } = req.body;
-  const tasks = readTasks();
 
+const { title } = req.body;
+const tasks = readTasks();
   // Intentional bug: missing validation for empty/blank title.
   const newTask = {
     id: tasks.length ? Math.max(...tasks.map(t => t.id)) + 1 : 1,
