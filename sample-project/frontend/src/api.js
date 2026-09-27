@@ -21,9 +21,17 @@ export async function fetchTasks(search = '') {
   // If the backend is down or returns a non-2xx status, this throws
   // inside a React event handler with no boundary, and the UI crashes
   // to a blank white screen instead of showing a message.
-  const res = await fetch(url);
-const data = await res.json();
-return data;
+  try {
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error(`Failed to load tasks (${res.status})`);
+    }
+
+    return await res.json();
+  } catch (err) {
+    throw new Error(`Could not reach TaskFlow API: ${err.message}`);
+  }
 }
 
 export async function createTask(title) {

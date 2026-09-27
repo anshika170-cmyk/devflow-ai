@@ -43,6 +43,12 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
 
 const { title } = req.body;
+
+  if (!title || !title.trim()) {
+    return res.status(400).json({
+      error: 'title is required and cannot be empty'
+    });
+  }
 const tasks = readTasks();
   // Intentional bug: missing validation for empty/blank title.
   const newTask = {
